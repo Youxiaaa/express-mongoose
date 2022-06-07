@@ -51,26 +51,30 @@ const getAllUsers = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-  const findUser = await student.find({ _id: {$eq: req.params.id} })
-  if (findUser.length === 0 || findUser[0].deletedAt) {
+  // 判斷有無相同名稱並且尚未被刪除的使用者
+  const findUser = await student.findOne({ $and: [
+    { name: {$eq: req.body.name} },
+    { deletedAt: {$eq: null} }
+  ] })
+  // 假如有找到
+  if (findUser) {
+    return res.status(401).send({
+      success: false,
+      message: '已有相同名稱的使用者'
+    })
+  }
+  // 沒找到執行
+  try {
+    await student.updateOne({ _id: req.params.id }, req.body)
+    res.status(201).send({
+      success: true,
+      message: '修改會員資料成功'
+    })
+  } catch (err) {
     res.status(401).send({
       success: false,
       message: '修改會員資料失敗'
     })
-  } else {
-    try {
-      const id = req.params.id
-      await student.updateOne({_id: `${id}`}, req.body)
-      res.status(201).send({
-        success: true,
-        message: '修改會員資料成功'
-      })
-    } catch (err) {
-      res.status(401).send({
-        success: false,
-        message: '修改會員資料失敗'
-      })
-    }
   }
 }
 
