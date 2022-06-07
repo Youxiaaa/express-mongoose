@@ -1,4 +1,4 @@
-# 此專案是使用 Express + mongodb + mongoose
+# Express + mongodb + mongoose 使用範例
 
 ## 使用套件
 - express
