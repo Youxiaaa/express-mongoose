@@ -79,25 +79,30 @@ const updateUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-  const findUser = await student.find({ _id: {$eq: req.params.id} })
-  if (findUser.length === 0 || findUser[0].deletedAt) {
+  // 尋找對象，條件為符合 id 以及 deletedAt 為空值
+  const findUser = await student.findOne({ $and: [
+    { _id: {$eq: req.params.id} },
+    { deletedAt: {$eq: null} }
+  ] })
+  // 找無對象執行
+  if (!findUser) {
+    return res.status(401).send({
+      success: false,
+      message: '刪除會員失敗'
+    })
+  }
+  // 否則執行
+  try {
+    await student.updateOne({_id: `${req.params.id}`}, { deletedAt: new Date() })
+    res.status(201).send({
+      success: true,
+      message: '刪除會員成功'
+    })
+  } catch (err) {
     res.status(401).send({
       success: false,
       message: '刪除會員失敗'
     })
-  } else {
-    try {
-      await student.updateOne({_id: `${req.params.id}`}, { deletedAt: new Date() })
-      res.status(201).send({
-        success: true,
-        message: '刪除會員成功'
-      })
-    } catch (err) {
-      res.status(401).send({
-        success: false,
-        message: '刪除會員失敗'
-      })
-    }
   }
 }
 

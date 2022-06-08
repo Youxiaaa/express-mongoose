@@ -7,7 +7,7 @@
 ## 環境設定
 - config
   - dbConfig(設定 mongoDB)
-- mondels
+- models
   - students(設定 students 的 model)
 - controllers
   - studentController(設定 student 相關的 CRUD)
